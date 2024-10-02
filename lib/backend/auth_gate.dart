@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cstain/components/loader.dart';
+//import 'package:cstain/components/streak_service.dart';
 import 'package:cstain/models/user.dart';
 import 'package:cstain/providers/auth_service.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
@@ -27,6 +28,10 @@ class AuthGate extends ConsumerWidget {
   static Future<void> _handleUserModel(User user, Ref ref) async {
     final userDoc = await _usersCollection.doc(user.uid).get();
 
+    //streak provider
+
+    // final streakService = StreakService();
+
     UserModel userModel;
 
     if (!userDoc.exists) {
@@ -39,12 +44,22 @@ class AuthGate extends ConsumerWidget {
         profile_picture_url: user.photoURL ?? 'Default Profile Picture URL',
         total_CO2_saved: 0.0,
         username: user.displayName ?? 'No Username',
+        currentStreak: 0,
+        lastActivityDate: Timestamp.now(),
+        streak_sunday: false,
+        streak_monday: false,
+        streak_tuesday: false,
+        streak_wednesday: false,
+        streak_thursday: false,
+        streak_friday: false,
+        streak_saturday: false,
       );
 
       await _usersCollection.doc(userModel.uid).set(userModel.toMap());
     } else {
       userModel = UserModel.fromMap(userDoc.data() as Map<String, dynamic>);
     }
+    //await streakService.updateStreakOnNewLog();
 
     ref.read(userProvider.notifier).state = userModel;
   }
@@ -77,8 +92,8 @@ class AuthGate extends ConsumerWidget {
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: action == AuthAction.signIn
-                    ? const Text('Welcome to FlutterFire, please sign in!')
-                    : const Text('Welcome to FlutterFire, please sign up!'),
+                    ? const Text('Welcome to C:Stain, please sign in!')
+                    : const Text('Welcome to C:stain, please sign up!'),
               );
             },
             footerBuilder: (context, action) {
